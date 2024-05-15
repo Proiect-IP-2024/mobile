@@ -1,20 +1,53 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import 'react-native-reanimated'; 
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import LoginPage from './loginPage';
+import HomePage from './homePage';
+import AllertPage from './allertPage';
+import HealthPage from './healthPage';
 
-export default function App() {
+
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+function HomeTabs() {
   return (
-    <View style={styles.container}>
-      <Text>Open up  to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName: string = '';
+
+          if (route.name === 'Home') {
+            iconName = focused ? 'home' : 'home-outline';
+          } else if (route.name === 'Health') {
+            iconName = focused ? 'heart' : 'heart-outline';
+          } else if (route.name === 'Allert') {
+            iconName = focused ? 'alert' : 'alert-outline';
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: 'tomato',
+        tabBarInactiveTintColor: 'gray',
+      })}
+    >
+      <Tab.Screen name="Home" component={HomePage} />
+      <Tab.Screen name="Health" component={HealthPage} />
+      <Tab.Screen name="Allert" component={AllertPage} />
+    </Tab.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="LoginPage">
+        <Stack.Screen name="LoginPage" component={LoginPage} options={{ headerShown: false }} />
+        <Stack.Screen name="HomeTabs" component={HomeTabs} options={{ headerShown: false }} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
