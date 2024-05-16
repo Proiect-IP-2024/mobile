@@ -9,22 +9,48 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [password, setPassword] = useState("");
   const [isModalVisible, setModalVisible] = useState(false);
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigation = useNavigation();
+  const [loading, setLoading] = useState();
+
+  const onPasswordChange = (text: React.SetStateAction<string>) => {
+    setPassword(text);
+    setPasswordError("");
+  };
+
+  const onEmailChange = (text: React.SetStateAction<string>) => {
+    setEmail(text);
+    setEmailError("");
+  };
 
   const handleLogin = () => {
     // Aici ar trebui să adaugi logica de autentificare
-    navigation.navigate("HomeTabs"); // Navighează la taburi după autentificare
+    let globalErrorFlag = false;
+    if (password === "") {
+      setPasswordError("Acest camp este obligatoriu");
+      globalErrorFlag = true;
+    }
+    if (email === "") {
+      setEmailError("Acest camp este obligatoriu");
+      globalErrorFlag = true;
+    }
+    if (!globalErrorFlag) {
+      // login api use
+    }
+    //navigation.navigate("HomeTabs"); // Navighează la taburi după autentificare
   };
 
   const handleRegister = () => {
@@ -83,6 +109,8 @@ export default function LoginPage() {
         >
           {/* Email input */}
           <TextInput
+            value={email}
+            onChangeText={(text) => onEmailChange(text)}
             placeholderTextColor={"#858585"}
             placeholder="Introdu emailul"
             style={{
@@ -90,9 +118,22 @@ export default function LoginPage() {
               fontSize: 20,
               borderRadius: 8,
               padding: 10,
+              borderColor: emailError ? "red" : "transparent",
+              borderWidth: 1,
             }}
           />
+          {emailError && (
+            <Text
+              style={{
+                color: "red",
+              }}
+            >
+              {emailError}
+            </Text>
+          )}
           <TextInput
+            value={password}
+            onChangeText={(text) => onPasswordChange(text)}
             placeholderTextColor={"#858585"}
             secureTextEntry={true}
             placeholder="Introdu parola"
@@ -101,12 +142,23 @@ export default function LoginPage() {
               fontSize: 20,
               borderRadius: 8,
               padding: 10,
+              borderColor: passwordError ? "red" : "transparent",
+              borderWidth: 1,
             }}
           />
+          {passwordError && (
+            <Text
+              style={{
+                color: "red",
+              }}
+            >
+              {passwordError}
+            </Text>
+          )}
         </View>
 
         {/* Login button */}
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleLogin}>
           <View
             style={{
               backgroundColor: "#001122",
@@ -116,15 +168,19 @@ export default function LoginPage() {
               marginTop: 30,
             }}
           >
-            <Text
-              style={{
-                color: "white",
-                fontWeight: "700",
-                fontSize: 18,
-              }}
-            >
-              Conecteaza-te
-            </Text>
+            {loading ? (
+              <ActivityIndicator color={"white"} />
+            ) : (
+              <Text
+                style={{
+                  color: "white",
+                  fontWeight: "700",
+                  fontSize: 18,
+                }}
+              >
+                Conecteaza-te
+              </Text>
+            )}
           </View>
         </TouchableOpacity>
 
