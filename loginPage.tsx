@@ -13,48 +13,87 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native";
+import axios from "axios";
+
+
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [password, setPassword] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
-  const [registerEmail, setRegisterEmail] = useState("");
-  const [registerPassword, setRegisterPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [registerEmail, setRegisterEmail] = useState('');
+  const [registerPassword, setRegisterPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const navigation = useNavigation();
-  const [loading, setLoading] = useState();
+  const [loading, setLoading] = useState(false);
 
   const onPasswordChange = (text: React.SetStateAction<string>) => {
     setPassword(text);
-    setPasswordError("");
+    setPasswordError('');
   };
 
   const onEmailChange = (text: React.SetStateAction<string>) => {
     setEmail(text);
-    setEmailError("");
+    setEmailError('');
   };
+  
 
-  const handleLogin = () => {
-    // Aici ar trebui să adaugi logica de autentificare
+  const handleLogin = async () => {
     let globalErrorFlag = false;
-    if (password === "") {
-      setPasswordError("Acest camp este obligatoriu");
+    if (password === '') {
+      setPasswordError('Acest camp este obligatoriu');
       globalErrorFlag = true;
     }
-    if (email === "") {
-      setEmailError("Acest camp este obligatoriu");
+    if (email === '') {
+      setEmailError('Acest camp este obligatoriu');
       globalErrorFlag = true;
     }
     if (!globalErrorFlag) {
-      // login api use
+      setLoading(true);
+      try {
+        // Use your local IP address instead of localhost
+        const response = await fetch('http://192.168.0.125:3000/user/login', { // Replace with your local IP
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userData: {
+              email: email,
+              password: password,
+            },
+          }),
+        });
+  
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Something went wrong');
+        }
+  
+        const data = await response.json();
+        setLoading(false);
+  
+        // const { token } = data;
+        // Save the token or handle the response as needed
+        // For example, save the token to local storage or state management
+        // localStorage.setItem('token', token);
+        navigation.navigate('HomeTabs'); // Navigate to the home tab on successful login
+      } catch (error) {
+        setLoading(false);
+        if (error.message.includes('User not found') || error.message.includes('Invalid password')) {
+          setPasswordError('Invalid email or password');
+        } else {
+          console.error('Login Error:', error);
+        }
+      }
     }
-    //navigation.navigate("HomeTabs"); // Navighează la taburi după autentificare
   };
+  
+  
 
   const handleRegister = () => {
-    // Aici ar trebui să adaugi logica de înregistrare
     setModalVisible(false);
   };
 
@@ -64,215 +103,79 @@ export default function LoginPage() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View
-        style={{
-          marginTop: 60,
-          alignItems: "center",
-          gap: 13,
-        }}
-      >
+      <View style={{ marginTop: 60, alignItems: 'center', gap: 13 }}>
         <Image
-          source={require("../mobile/assets/EldersHelperIcon.png")}
-          style={{
-            width: 100,
-            height: 100,
-          }}
+          source={require('../mobile/assets/EldersHelperIcon.png')}
+          style={{ width: 100, height: 100 }}
         />
-        <Text
-          style={{
-            fontSize: 25,
-            fontWeight: "600",
-          }}
-        >
-          Elder's Helper
-        </Text>
+        <Text style={{ fontSize: 25, fontWeight: '600' }}>Elder's Helper</Text>
       </View>
-
-      <View
-        style={{
-          marginTop: 20,
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 30,
-            fontWeight: "700",
-          }}
-        >
-          Conectare
-        </Text>
-        <View
-          style={{
-            gap: 15,
-            marginTop: 10,
-          }}
-        >
-          {/* Email input */}
+      <View style={{ marginTop: 20 }}>
+        <Text style={{ fontSize: 30, fontWeight: '700' }}>Conectare</Text>
+        <View style={{ gap: 15, marginTop: 10 }}>
           <TextInput
             value={email}
             onChangeText={(text) => onEmailChange(text)}
-            placeholderTextColor={"#858585"}
+            placeholderTextColor={'#858585'}
             placeholder="Introdu emailul"
             style={{
-              backgroundColor: "#D9D9D9",
+              backgroundColor: '#D9D9D9',
               fontSize: 20,
               borderRadius: 8,
               padding: 10,
-              borderColor: emailError ? "red" : "transparent",
+              borderColor: emailError ? 'red' : 'transparent',
               borderWidth: 1,
             }}
           />
           {emailError && (
-            <Text
-              style={{
-                color: "red",
-              }}
-            >
-              {emailError}
-            </Text>
+            <Text style={{ color: 'red' }}>{emailError}</Text>
           )}
           <TextInput
             value={password}
             onChangeText={(text) => onPasswordChange(text)}
-            placeholderTextColor={"#858585"}
+            placeholderTextColor={'#858585'}
             secureTextEntry={true}
             placeholder="Introdu parola"
             style={{
-              backgroundColor: "#D9D9D9",
+              backgroundColor: '#D9D9D9',
               fontSize: 20,
               borderRadius: 8,
               padding: 10,
-              borderColor: passwordError ? "red" : "transparent",
+              borderColor: passwordError ? 'red' : 'transparent',
               borderWidth: 1,
             }}
           />
           {passwordError && (
-            <Text
-              style={{
-                color: "red",
-              }}
-            >
-              {passwordError}
-            </Text>
+            <Text style={{ color: 'red' }}>{passwordError}</Text>
           )}
         </View>
-
-        {/* Login button */}
         <TouchableOpacity onPress={handleLogin}>
-          <View
-            style={{
-              backgroundColor: "#001122",
-              alignItems: "center",
-              padding: 13,
-              borderRadius: 8,
-              marginTop: 30,
-            }}
-          >
+          <View style={{
+            backgroundColor: '#001122',
+            alignItems: 'center',
+            padding: 13,
+            borderRadius: 8,
+            marginTop: 30,
+          }}>
             {loading ? (
-              <ActivityIndicator color={"white"} />
+              <ActivityIndicator color={'white'} />
             ) : (
-              <Text
-                style={{
-                  color: "white",
-                  fontWeight: "700",
-                  fontSize: 18,
-                }}
-              >
-                Conecteaza-te
-              </Text>
+              <Text style={{
+                color: 'white',
+                fontWeight: '700',
+                fontSize: 18,
+              }}>Conecteaza-te</Text>
             )}
           </View>
         </TouchableOpacity>
-
-        {/* <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          placeholderTextColor="#aaa"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          placeholderTextColor="#aaa"
-        />
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Log In</Text>
-        </TouchableOpacity> */}
       </View>
-      {/** Footer */}
-      <View
-        style={{
-          alignItems: "center",
-          justifyContent: "center",
-          flex: 1,
-        }}
-      >
-        <Image source={require("../mobile/assets/Stetoscop.png")} />
+      <View style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+        <Image source={require('../mobile/assets/Stetoscop.png')} />
       </View>
-      {/* <TouchableOpacity style={styles.registerButton} onPress={toggleModal}>
-        <Text style={styles.registerButtonText}>Register</Text>
-      </TouchableOpacity> */}
-
-      {/* <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={toggleModal}
-      >
-        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Register</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Email"
-                value={registerEmail}
-                onChangeText={setRegisterEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                placeholderTextColor="#aaa"
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Password"
-                value={registerPassword}
-                onChangeText={setRegisterPassword}
-                secureTextEntry
-                placeholderTextColor="#aaa"
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry
-                placeholderTextColor="#aaa"
-              />
-              <TouchableOpacity
-                style={styles.registerButton}
-                onPress={handleRegister}
-              >
-                <Text style={styles.registerButtonText}>Sign Up</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={toggleModal}
-              >
-                <Text style={styles.closeButtonText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal> */}
     </SafeAreaView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
