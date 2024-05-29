@@ -15,8 +15,6 @@ import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native";
 import axios from "axios";
 
-
-
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -38,7 +36,6 @@ export default function LoginPage() {
     setEmail(text);
     setEmailError('');
   };
-  
 
   const handleLogin = async () => {
     let globalErrorFlag = false;
@@ -53,36 +50,26 @@ export default function LoginPage() {
     if (!globalErrorFlag) {
       setLoading(true);
       try {
-        // Use your local IP address instead of localhost
-        const response = await fetch('http://192.168.0.125:3000/user/login', { // Replace with your local IP
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
+        const response = await axios.post('http://138.68.82.166:1000/user/login', {
+          userData: {
+            email: email,
+            password: password,
           },
-          body: JSON.stringify({
-            userData: {
-              email: email,
-              password: password,
-            },
-          }),
         });
-  
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Something went wrong');
-        }
-  
-        const data = await response.json();
+
         setLoading(false);
-  
-        // const { token } = data;
-        // Save the token or handle the response as needed
-        // For example, save the token to local storage or state management
-        // localStorage.setItem('token', token);
-        navigation.navigate('HomeTabs'); // Navigate to the home tab on successful login
+
+        if (response.data && response.data.token) {
+          // Save the token in local storage or any state management
+          // localStorage.setItem('token', response.data.token);
+          // Navigate to the home tab on successful login
+          navigation.navigate('HomeTabs');
+        } else {
+          throw new Error('Invalid login response');
+        }
       } catch (error) {
         setLoading(false);
-        if (error.message.includes('User not found') || error.message.includes('Invalid password')) {
+        if (error.response && (error.response.data.message.includes('User not found') || error.response.data.message.includes('Invalid password'))) {
           setPasswordError('Invalid email or password');
         } else {
           console.error('Login Error:', error);
@@ -90,8 +77,6 @@ export default function LoginPage() {
       }
     }
   };
-  
-  
 
   const handleRegister = () => {
     setModalVisible(false);
@@ -115,7 +100,7 @@ export default function LoginPage() {
         <View style={{ gap: 15, marginTop: 10 }}>
           <TextInput
             value={email}
-            onChangeText={(text) => onEmailChange(text)}
+            onChangeText={onEmailChange}
             placeholderTextColor={'#858585'}
             placeholder="Introdu emailul"
             style={{
@@ -132,7 +117,7 @@ export default function LoginPage() {
           )}
           <TextInput
             value={password}
-            onChangeText={(text) => onPasswordChange(text)}
+            onChangeText={onPasswordChange}
             placeholderTextColor={'#858585'}
             secureTextEntry={true}
             placeholder="Introdu parola"
@@ -175,7 +160,6 @@ export default function LoginPage() {
     </SafeAreaView>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
