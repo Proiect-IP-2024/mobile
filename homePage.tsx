@@ -1,34 +1,47 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
+import axios from "axios";
 
 export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState({
-    first_name: '',
-    last_name: '',
-    cnp: '',
-    id_medic: '',
-    varsta: '',
-    adresa: '',
-    telefon: '',
-    profesie: '',
-    loc_munca: ''
+    first_name: "",
+    last_name: "",
+    cnp: "",
+    id_medic: "",
+    varsta: "",
+    adresa: "",
+    telefon: "",
+    profesie: "",
+    loc_munca: "",
   });
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userResponse = await axios.get('http://138.68.82.166:1000/user/getUserData', {
-          headers: {
-            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJwYWNpZW50QHBhY2llbnQuY29tIiwiaWF0IjoxNzE3MDAzNjg2LCJleHAiOjE3MTcwMDcyODZ9.BdZiqyjCvInlbvwSqinPKnqj4RL8S6DIzZ3MRYNIEEI` 
+        const userResponse = await axios.get(
+          "http://138.68.82.166:1000/user/getUserData",
+          {
+            headers: {
+              Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJwYWNpZW50QHBhY2llbnQuY29tIiwiaWF0IjoxNzE3MDAzNjg2LCJleHAiOjE3MTcwMDcyODZ9.BdZiqyjCvInlbvwSqinPKnqj4RL8S6DIzZ3MRYNIEEI`,
+            },
           }
-        });
-        const pacientResponse = await axios.get('http://138.68.82.166:1000/user/getPacientData', {
-          headers: {
-            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJwYWNpZW50QHBhY2llbnQuY29tIiwiaWF0IjoxNzE3MDAzNjg2LCJleHAiOjE3MTcwMDcyODZ9.BdZiqyjCvInlbvwSqinPKnqj4RL8S6DIzZ3MRYNIEEI` 
+        );
+        const pacientResponse = await axios.get(
+          "http://138.68.82.166:1000/user/getPacientData",
+          {
+            headers: {
+              Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJwYWNpZW50QHBhY2llbnQuY29tIiwiaWF0IjoxNzE3MDAzNjg2LCJleHAiOjE3MTcwMDcyODZ9.BdZiqyjCvInlbvwSqinPKnqj4RL8S6DIzZ3MRYNIEEI`,
+            },
           }
-        });
+        );
 
         const userData = userResponse.data.user;
         const pacientData = pacientResponse.data.pacient;
@@ -42,12 +55,12 @@ export default function HomePage() {
           adresa: pacientData.adresa_pacient,
           telefon: pacientData.telefon_pacient,
           profesie: pacientData.profesie_pacient,
-          loc_munca: pacientData.loc_munca_pacient
+          loc_munca: pacientData.loc_munca_pacient,
         });
 
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error("Error fetching user data:", error);
         setLoading(false);
       }
     };
@@ -62,8 +75,12 @@ export default function HomePage() {
       ) : (
         <>
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>{userData.first_name || 'First Name'}</Text>
-            <Text style={styles.headerTitle}>{userData.last_name || 'Last Name'}</Text>
+            <Text style={styles.headerTitle}>
+              {userData.first_name || "First Name"}
+            </Text>
+            <Text style={styles.headerTitle}>
+              {userData.last_name || "Last Name"}
+            </Text>
           </View>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Informatii generale</Text>
@@ -75,9 +92,6 @@ export default function HomePage() {
               <InfoItem label="Profesie:" value={userData.profesie} />
               <InfoItem label="Loc de munca:" value={userData.loc_munca} />
             </View>
-            <TouchableOpacity style={styles.downloadButton}>
-              <Text style={styles.downloadButtonText}>Descarca fisa medicala</Text>
-            </TouchableOpacity>
           </View>
         </>
       )}
@@ -88,41 +102,41 @@ export default function HomePage() {
 const InfoItem = ({ label, value }: any) => (
   <View style={styles.infoItem}>
     <Text style={styles.infoLabel}>{label}</Text>
-    <Text style={styles.infoValue}>{value || 'N/A'}</Text>
+    <Text style={styles.infoValue}>{value || "N/A"}</Text>
   </View>
 );
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f0f5',
+    backgroundColor: "#f0f0f5",
     padding: 20,
   },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 20,
-    position: 'relative',
+    position: "relative",
   },
   headerTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
   },
   section: {
     marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginBottom: 10,
   },
   infoBox: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -133,31 +147,31 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
   },
   infoValue: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: "#ddd",
     paddingVertical: 5,
   },
   downloadButton: {
-    width: '100%',
+    width: "100%",
     height: 50,
-    backgroundColor: '#4CAF50',
+    backgroundColor: "#4CAF50",
     borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 5,
   },
   downloadButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
