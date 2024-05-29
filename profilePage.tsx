@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { KeyboardAvoidingView, Platform } from "react-native";
 import {
   View,
@@ -11,6 +11,12 @@ import {
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default function ProfilePage() {
+  const [CNP, setCNP] = useState("123456789");
+  const [age, setAge] = useState("50");
+  const [address, setAddress] = useState("Adresa 12345");
+  const [phone, setPhone] = useState("123456789");
+  const [profession, setProfession] = useState("Sofer pe tir");
+  const [workPlace, setWorkPlace] = useState("Loc de munca 1234");
   return (
     <View style={styles.container}>
       {/* Profile Picture */}
@@ -64,6 +70,7 @@ export default function ProfilePage() {
             >
               <Text>CNP</Text>
               <TextInput
+                placeholder="Introdu un CNP"
                 style={{
                   borderColor: "gray",
                   marginTop: 10,
@@ -72,7 +79,8 @@ export default function ProfilePage() {
                   paddingVertical: 10,
                   paddingHorizontal: 10,
                 }}
-                value="123456789"
+                value={CNP}
+                onChangeText={(text) => setCNP(text)}
               />
             </View>
             {/* Varsta */}
@@ -83,6 +91,7 @@ export default function ProfilePage() {
             >
               <Text>Varsta</Text>
               <TextInput
+                placeholder="Introdu varsta"
                 style={{
                   borderColor: "gray",
                   marginTop: 10,
@@ -91,7 +100,8 @@ export default function ProfilePage() {
                   paddingVertical: 10,
                   paddingHorizontal: 10,
                 }}
-                value="50"
+                value={age}
+                onChangeText={(text) => setAge(text)}
               />
             </View>
             {/* Adresa */}
@@ -102,6 +112,7 @@ export default function ProfilePage() {
             >
               <Text>Adresa</Text>
               <TextInput
+                placeholder="Introdu o adresa"
                 style={{
                   borderColor: "gray",
                   marginTop: 10,
@@ -110,7 +121,8 @@ export default function ProfilePage() {
                   paddingVertical: 10,
                   paddingHorizontal: 10,
                 }}
-                value="Adresa 12345"
+                onChangeText={(text) => setAddress(text)}
+                value={address}
               />
             </View>
             {/* Telefon */}
@@ -129,7 +141,9 @@ export default function ProfilePage() {
                   paddingVertical: 10,
                   paddingHorizontal: 10,
                 }}
-                value="123456789"
+                placeholder="Introdu un telefon"
+                onChangeText={(text) => setPhone(text)}
+                value={phone}
               />
             </View>
             {/* Profesie */}
@@ -140,6 +154,7 @@ export default function ProfilePage() {
             >
               <Text>Profesie</Text>
               <TextInput
+                placeholder="Introdu profesia"
                 style={{
                   borderColor: "gray",
                   marginTop: 10,
@@ -148,7 +163,8 @@ export default function ProfilePage() {
                   paddingVertical: 10,
                   paddingHorizontal: 10,
                 }}
-                value="Sofer pe tir"
+                onChangeText={(text) => setProfession(text)}
+                value={profession}
               />
             </View>
             {/* Loc de munca */}
@@ -167,14 +183,14 @@ export default function ProfilePage() {
                   paddingVertical: 10,
                   paddingHorizontal: 10,
                 }}
-                value="Loc de munca"
+                placeholder="Introdu locul de munca"
+                value={workPlace}
+                onChangeText={(text) => setWorkPlace(text)}
               />
             </View>
             <View style={{ flex: 1 }} />
             <TouchableOpacity style={styles.downloadButton}>
-              <Text style={styles.downloadButtonText}>
-                Salveaza date
-              </Text>
+              <Text style={styles.downloadButtonText}>Salveaza date</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.downloadButton}>
               <Text style={styles.downloadButtonText}>

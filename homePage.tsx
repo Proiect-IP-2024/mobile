@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import axios from "axios";
+import { getAccessToken } from "./storage/storageService";
 
 export default function HomePage() {
   const [loading, setLoading] = useState(true);
@@ -26,11 +27,12 @@ export default function HomePage() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        const accessToken = getAccessToken();
         const userResponse = await axios.get(
           "http://138.68.82.166:1000/user/getUserData",
           {
             headers: {
-              Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJwYWNpZW50QHBhY2llbnQuY29tIiwiaWF0IjoxNzE3MDAzNjg2LCJleHAiOjE3MTcwMDcyODZ9.BdZiqyjCvInlbvwSqinPKnqj4RL8S6DIzZ3MRYNIEEI`,
+              Authorization: `Bearer ${accessToken}`,
             },
           }
         );

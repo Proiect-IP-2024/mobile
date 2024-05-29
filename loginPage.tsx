@@ -33,6 +33,7 @@ export default function LoginPage() {
   };
 
   const handleLogin = async () => {
+    navigation.navigate("HomeTabs");
     let globalErrorFlag = false;
     if (password === "") {
       setPasswordError("Acest camp este obligatoriu");
