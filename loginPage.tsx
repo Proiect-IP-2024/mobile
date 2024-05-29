@@ -8,7 +8,8 @@ import {
   Image,
   ActivityIndicator,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { SafeAreaView } from "react-native";
 import axios from "axios";
 import { BASE_URL } from "./routes/routes";
@@ -19,7 +20,7 @@ export default function LoginPage() {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [password, setPassword] = useState("");
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<any>>();
   const [loading, setLoading] = useState(false);
 
   const onPasswordChange = (text: React.SetStateAction<string>) => {
@@ -45,10 +46,12 @@ export default function LoginPage() {
     if (!globalErrorFlag) {
       setLoading(true);
       try {
+
         const response = await fetch(`${BASE_URL}/user/login`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+
           },
           body: JSON.stringify({
             userData: {
@@ -70,7 +73,7 @@ export default function LoginPage() {
         } else {
           throw new Error("Invalid login response");
         }
-      } catch (error) {
+      } catch (error : any) {
         setLoading(false);
         if (
           error.response &&

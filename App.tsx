@@ -19,12 +19,14 @@ function HomeTabs() {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: string = "";
 
+
           if (route.name === "Acasa") {
             iconName = focused ? "home" : "home-outline";
           } else if (route.name === "Sanatate") {
             iconName = focused ? "heart" : "heart-outline";
           } else if (route.name === "Profil") {
             iconName = focused ? "user" : "user-o";
+
           }
 
           if (route.name === "Acasa" || route.name === "Sanatate")
@@ -37,7 +39,9 @@ function HomeTabs() {
     >
       <Tab.Screen name="Acasa" component={HomePage} />
       <Tab.Screen name="Sanatate" component={HealthPage} />
+
       <Tab.Screen name="Profil" component={ProfilePage} />
+
     </Tab.Navigator>
   );
 }
@@ -46,6 +50,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="LoginPage">
+
         <Stack.Screen
           name="LoginPage"
           component={LoginPage}
@@ -56,6 +61,7 @@ export default function App() {
           component={HomeTabs}
           options={{ headerShown: false }}
         />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
