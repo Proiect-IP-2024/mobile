@@ -12,13 +12,15 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "dev.jurma.eldershelper"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon_1.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "dev.jurma.eldershelper"
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { KeyboardAvoidingView, Platform } from "react-native";
+import { Alert, KeyboardAvoidingView, Platform } from "react-native";
 import {
   View,
   Text,
@@ -7,8 +7,12 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  Linking,
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+//@ts-expect-error ts error
+import RNHTMLtoPDF from "react-native-html-to-pdf";
+import FileViewer from "react-native-file-viewer";
 
 export default function ProfilePage() {
   const [CNP, setCNP] = useState("123456789");
@@ -17,6 +21,84 @@ export default function ProfilePage() {
   const [phone, setPhone] = useState("123456789");
   const [profession, setProfession] = useState("Sofer pe tir");
   const [workPlace, setWorkPlace] = useState("Loc de munca 1234");
+  const createPDF = async () => {
+    try {
+      let htmlContent = `
+        <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; padding: 20px; }
+              h1 { text-align: center; }
+              .section { margin-bottom: 20px; }
+              .label { font-weight: bold; }
+            </style>
+          </head>
+          <body>
+            <h1>Fișa Medicală</h1>
+            <div class="section">
+              <div class="label">Nume Prenume:</div>
+              <div>Nume Prenume</div>
+            </div>
+            <div class="section">
+              <div class="label">CNP:</div>
+              <div>${CNP}</div>
+            </div>
+            <div class="section">
+              <div class="label">Vârstă:</div>
+              <div>${age}</div>
+            </div>
+            <div class="section">
+              <div class="label">Adresă:</div>
+              <div>${address}</div>
+            </div>
+            <div class="section">
+              <div class="label">Telefon:</div>
+              <div>${phone}</div>
+            </div>
+            <div class="section">
+              <div class="label">Profesie:</div>
+              <div>${profession}</div>
+            </div>
+            <div class="section">
+              <div class="label">Loc de muncă:</div>
+              <div>${workPlace}</div>
+            </div>
+          </body>
+        </html>
+      `;
+
+      let PDFOptions = {
+        html: htmlContent,
+        fileName: "FisaMedicala",
+        directory: Platform.OS === "android" ? "Documents" : "Documents",
+      };
+
+      let file = await RNHTMLtoPDF.convert(PDFOptions);
+      if (!file.filePath) return;
+      Alert.alert("Fisa medicala s-a creat!", `Un PDF cu numele FisaMedicala.pdf s-a generat cu succes!`, [
+        {
+          text: "Deschide PDF",
+          onPress: async () => {
+            try {
+              await FileViewer.open(file.filePath, {
+                showOpenWithDialog: true,
+                showAppsSuggestions: true,
+              });
+            } catch (e) {
+              console.log(e);
+            }
+          },
+        },
+        {
+          text: "Inchide",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+      ]);
+    } catch (error) {
+      console.log("Failed to generate pdf", error.message);
+    }
+  };
   return (
     <View style={styles.container}>
       {/* Profile Picture */}
@@ -192,7 +274,7 @@ export default function ProfilePage() {
             <TouchableOpacity style={styles.downloadButton}>
               <Text style={styles.downloadButtonText}>Salveaza date</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.downloadButton}>
+            <TouchableOpacity style={styles.downloadButton} onPress={createPDF}>
               <Text style={styles.downloadButtonText}>
                 Descarca fisa medicala
               </Text>
