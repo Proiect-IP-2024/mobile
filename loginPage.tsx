@@ -11,60 +11,67 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native";
 import axios from "axios";
+import { BASE_URL } from "./routes/routes";
+import { setAccessToken } from "./storage/storageService";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [password, setPassword] = useState("");
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
 
   const onPasswordChange = (text: React.SetStateAction<string>) => {
     setPassword(text);
-    setPasswordError('');
+    setPasswordError("");
   };
 
   const onEmailChange = (text: React.SetStateAction<string>) => {
     setEmail(text);
-    setEmailError('');
+    setEmailError("");
   };
 
   const handleLogin = async () => {
     let globalErrorFlag = false;
-    if (password === '') {
-      setPasswordError('Acest camp este obligatoriu');
+    if (password === "") {
+      setPasswordError("Acest camp este obligatoriu");
       globalErrorFlag = true;
     }
-    if (email === '') {
-      setEmailError('Acest camp este obligatoriu');
+    if (email === "") {
+      setEmailError("Acest camp este obligatoriu");
       globalErrorFlag = true;
     }
     if (!globalErrorFlag) {
       setLoading(true);
       try {
-        const response = await axios.post('http://192.168.1.174:1000/user/login', {
+        const response = await axios.post(`${BASE_URL}/user/login`, {
           userData: {
             email: email,
             password: password,
           },
         });
         setLoading(false);
-        console.log(response.data.token); 
+        console.log(response.data.token);
         if (response.data && response.data.token) {
           // Save the token in local storage or any state management
           // localStorage.setItem('token', response.data.token);
+          await setAccessToken(response.data.token);
           // Navigate to the home tab on successful login
-          navigation.navigate('HomeTabs');
+          navigation.navigate("HomeTabs");
         } else {
-          throw new Error('Invalid login response');
+          throw new Error("Invalid login response");
         }
       } catch (error) {
         setLoading(false);
-        if (error.response && (error.response.data.message.includes('User not found') || error.response.data.message.includes('Invalid password'))) {
-          setPasswordError('Invalid email or password');
+        if (
+          error.response &&
+          (error.response.data.message.includes("User not found") ||
+            error.response.data.message.includes("Invalid password"))
+        ) {
+          setPasswordError("Invalid email or password");
         } else {
-          console.error('Login Error:', error);
+          console.error("Login Error:", error);
         }
       }
     }
@@ -72,75 +79,81 @@ export default function LoginPage() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.section}>
-      <View style={{ marginTop: 60, alignItems: 'center', gap: 13 }}>
-        <Image
-          source={require('../mobile/assets/icon_1.png')}
-          style={{ width: 150, height: 150 }}
-        />
-        <Text style={{ fontSize: 25, fontWeight: '600' }}>Elder's Helper</Text>
-      </View>
-      <View style={{ marginTop: 20 }}>
-        <Text style={{ fontSize: 30, fontWeight: '700' }}>Conectare</Text>
-        <View style={{ gap: 15, marginTop: 10 }}>
-          <TextInput
-            value={email}
-            onChangeText={onEmailChange}
-            placeholderTextColor={'#858585'}
-            placeholder="Introdu emailul"
-            style={{
-              backgroundColor: '#D9D9D9',
-              fontSize: 20,
-              borderRadius: 8,
-              padding: 10,
-              borderColor: emailError ? 'red' : 'transparent',
-              borderWidth: 1,
-            }}
+        <View style={{ marginTop: 60, alignItems: "center", gap: 13 }}>
+          <Image
+            source={require("../mobile/assets/icon_1.png")}
+            style={{ width: 150, height: 150 }}
           />
-          {emailError && (
-            <Text style={{ color: 'red' }}>{emailError}</Text>
-          )}
-          <TextInput
-            value={password}
-            onChangeText={onPasswordChange}
-            placeholderTextColor={'#858585'}
-            secureTextEntry={true}
-            placeholder="Introdu parola"
-            style={{
-              backgroundColor: '#D9D9D9',
-              fontSize: 20,
-              borderRadius: 8,
-              padding: 10,
-              borderColor: passwordError ? 'red' : 'transparent',
-              borderWidth: 1,
-            }}
-          />
-          {passwordError && (
-            <Text style={{ color: 'red' }}>{passwordError}</Text>
-          )}
+          <Text style={{ fontSize: 25, fontWeight: "600" }}>
+            Elder's Helper
+          </Text>
         </View>
-        <TouchableOpacity onPress={handleLogin}>
-          <View style={{
-            backgroundColor: '#001122',
-            alignItems: 'center',
-            padding: 13,
-            borderRadius: 8,
-            marginTop: 30,
-          }}>
-            {loading ? (
-              <ActivityIndicator color={'white'} />
-            ) : (
-              <Text style={{
-                color: 'white',
-                fontWeight: '700',
-                fontSize: 18,
-              }}>Conecteaza-te</Text>
+        <View style={{ marginTop: 20 }}>
+          <Text style={{ fontSize: 30, fontWeight: "700" }}>Conectare</Text>
+          <View style={{ gap: 15, marginTop: 10 }}>
+            <TextInput
+              value={email}
+              onChangeText={onEmailChange}
+              placeholderTextColor={"#858585"}
+              placeholder="Introdu emailul"
+              style={{
+                backgroundColor: "#D9D9D9",
+                fontSize: 20,
+                borderRadius: 8,
+                padding: 10,
+                borderColor: emailError ? "red" : "transparent",
+                borderWidth: 1,
+              }}
+            />
+            {emailError && <Text style={{ color: "red" }}>{emailError}</Text>}
+            <TextInput
+              value={password}
+              onChangeText={onPasswordChange}
+              placeholderTextColor={"#858585"}
+              secureTextEntry={true}
+              placeholder="Introdu parola"
+              style={{
+                backgroundColor: "#D9D9D9",
+                fontSize: 20,
+                borderRadius: 8,
+                padding: 10,
+                borderColor: passwordError ? "red" : "transparent",
+                borderWidth: 1,
+              }}
+            />
+            {passwordError && (
+              <Text style={{ color: "red" }}>{passwordError}</Text>
             )}
           </View>
-        </TouchableOpacity>
-      </View>
-      <View style={{ alignItems: 'center', marginTop: 20, flex: 1 }}>
-        <Image source={require('../mobile/assets/Stetoscop.png')} />
-      </View>
+          <TouchableOpacity onPress={handleLogin}>
+            <View
+              style={{
+                backgroundColor: "#001122",
+                alignItems: "center",
+                padding: 13,
+                borderRadius: 8,
+                marginTop: 30,
+              }}
+            >
+              {loading ? (
+                <ActivityIndicator color={"white"} />
+              ) : (
+                <Text
+                  style={{
+                    color: "white",
+                    fontWeight: "700",
+                    fontSize: 18,
+                  }}
+                >
+                  Conecteaza-te
+                </Text>
+              )}
+            </View>
+          </TouchableOpacity>
+        </View>
+        <View style={{ alignItems: "center", marginTop: 20, flex: 1 }}>
+          <Image source={require("../mobile/assets/Stetoscop.png")} />
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -150,11 +163,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-   
   },
-    section: {
-      marginHorizontal: 30,
-    }, 
+  section: {
+    marginHorizontal: 30,
+  },
   title: {
     fontSize: 32,
     fontWeight: "bold",
