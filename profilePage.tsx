@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import { Alert, KeyboardAvoidingView, Platform } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import {
   View,
   Text,
@@ -13,14 +18,16 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 //@ts-expect-error ts error
 import RNHTMLtoPDF from "react-native-html-to-pdf";
 import FileViewer from "react-native-file-viewer";
+import { getAccessToken } from "./storage/storageService";
+import axios from "axios";
 
 export default function ProfilePage() {
-  const [CNP, setCNP] = useState("123456789");
+  const [CNP, setCNP] = useState("5029493554412");
   const [age, setAge] = useState("50");
-  const [address, setAddress] = useState("Adresa 12345");
-  const [phone, setPhone] = useState("123456789");
-  const [profession, setProfession] = useState("Sofer pe tir");
-  const [workPlace, setWorkPlace] = useState("Loc de munca 1234");
+  const [address, setAddress] = useState("Str. Cluj 12");
+  const [phone, setPhone] = useState("0765456334");
+  const [profession, setProfession] = useState("Profesor");
+  const [workPlace, setWorkPlace] = useState("Universitatea Politehnica Timisoara");
   const createPDF = async () => {
     try {
       let htmlContent = `
@@ -75,30 +82,73 @@ export default function ProfilePage() {
 
       let file = await RNHTMLtoPDF.convert(PDFOptions);
       if (!file.filePath) return;
-      Alert.alert("Fisa medicala s-a creat!", `Un PDF cu numele FisaMedicala.pdf s-a generat cu succes!`, [
-        {
-          text: "Deschide PDF",
-          onPress: async () => {
-            try {
-              await FileViewer.open(file.filePath, {
-                showOpenWithDialog: true,
-                showAppsSuggestions: true,
-              });
-            } catch (e) {
-              console.log(e);
-            }
+      Alert.alert(
+        "Fisa medicala s-a creat!",
+        `Un PDF cu numele FisaMedicala.pdf s-a generat cu succes!`,
+        [
+          {
+            text: "Deschide PDF",
+            onPress: async () => {
+              try {
+                await FileViewer.open(file.filePath, {
+                  showOpenWithDialog: true,
+                  showAppsSuggestions: true,
+                });
+              } catch (e) {
+                console.log(e);
+              }
+            },
           },
-        },
-        {
-          text: "Inchide",
-          onPress: () => console.log("Cancel Pressed"),
-          style: "cancel",
-        },
-      ]);
+          {
+            text: "Inchide",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel",
+          },
+        ]
+      );
     } catch (error) {
       console.log("Failed to generate pdf", error.message);
     }
   };
+  const [loading, setLoading] = useState(false);
+
+  const updateUserData = async () => {
+    try {
+      const token = await getAccessToken();
+      const userData = {
+        firstName: "John",
+        lastName: "Doe",
+      };
+
+      const response = await axios.post(
+        "/user/updateUserData",
+        {
+          userData: {
+            ...userData,
+            CNP,
+            age,
+            address,
+            phone,
+            profession,
+            workPlace,
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("User data updated:", response.data);
+    } catch (error) {
+      console.error(
+        "Error updating user data:",
+        error.response ? error.response.data : error.message
+      );
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Profile Picture */}
@@ -133,7 +183,7 @@ export default function ProfilePage() {
                   fontWeight: "600",
                 }}
               >
-                Nume Prenume
+                Ion Popescu
               </Text>
               <Text
                 style={{
@@ -272,7 +322,11 @@ export default function ProfilePage() {
             </View>
             <View style={{ flex: 1 }} />
             <TouchableOpacity style={styles.downloadButton}>
-              <Text style={styles.downloadButtonText}>Salveaza date</Text>
+              {loading ? (
+                <ActivityIndicator color={"white"} />
+              ) : (
+                <Text style={styles.downloadButtonText}>Salveaza date</Text>
+              )}
             </TouchableOpacity>
             <TouchableOpacity style={styles.downloadButton} onPress={createPDF}>
               <Text style={styles.downloadButtonText}>

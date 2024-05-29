@@ -33,7 +33,6 @@ export default function LoginPage() {
   };
 
   const handleLogin = async () => {
-    navigation.navigate("HomeTabs");
     let globalErrorFlag = false;
     if (password === "") {
       setPasswordError("Acest camp este obligatoriu");
@@ -46,13 +45,21 @@ export default function LoginPage() {
     if (!globalErrorFlag) {
       setLoading(true);
       try {
-        const response = await axios.post(`${BASE_URL}/user/login`, {
-          userData: {
-            email: email,
-            password: password,
+        const response = await fetch(`${BASE_URL}/user/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            userData: {
+              email: email,
+              password: password,
+            },
+          }),
         });
-        setLoading(false);
+
+        const data = await response.json();
+
         console.log(response.data.token);
         if (response.data && response.data.token) {
           // Save the token in local storage or any state management

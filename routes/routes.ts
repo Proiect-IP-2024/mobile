@@ -1,4 +1,4 @@
-export const BASE_URL = "http://192.168.1.174:1000";
+export const BASE_URL = "http://138.68.82.166:1000";
 
 export const MyRoutes = {
   HomePage: "/",

@@ -13,15 +13,15 @@ import { getAccessToken } from "./storage/storageService";
 export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState({
-    first_name: "",
-    last_name: "",
-    cnp: "",
-    id_medic: "",
-    varsta: "",
-    adresa: "",
-    telefon: "",
-    profesie: "",
-    loc_munca: "",
+    first_name: "Ion",
+    last_name: "Popescu",
+    cnp: "5029493554412",
+    id_medic: "1",
+    varsta: "50",
+    adresa: "Str. Cluj 12",
+    telefon: "0765456334",
+    profesie: "Profesor",
+    loc_munca: "Universitatea Politehnica Timisoara",
   });
 
   useEffect(() => {
