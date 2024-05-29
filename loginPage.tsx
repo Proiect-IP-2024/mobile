@@ -5,9 +5,6 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Modal,
-  TouchableWithoutFeedback,
-  Keyboard,
   Image,
   ActivityIndicator,
 } from "react-native";
@@ -20,10 +17,6 @@ export default function LoginPage() {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [password, setPassword] = useState('');
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [registerEmail, setRegisterEmail] = useState('');
-  const [registerPassword, setRegisterPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
 
@@ -50,15 +43,14 @@ export default function LoginPage() {
     if (!globalErrorFlag) {
       setLoading(true);
       try {
-        const response = await axios.post('http://138.68.82.166:1000/user/login', {
+        const response = await axios.post('http://192.168.1.174:1000/user/login', {
           userData: {
             email: email,
             password: password,
           },
         });
-
         setLoading(false);
-
+        console.log(response.data.token); 
         if (response.data && response.data.token) {
           // Save the token in local storage or any state management
           // localStorage.setItem('token', response.data.token);
@@ -77,21 +69,13 @@ export default function LoginPage() {
       }
     }
   };
-
-  const handleRegister = () => {
-    setModalVisible(false);
-  };
-
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
-  };
-
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.section}>
       <View style={{ marginTop: 60, alignItems: 'center', gap: 13 }}>
         <Image
-          source={require('../mobile/assets/EldersHelperIcon.png')}
-          style={{ width: 100, height: 100 }}
+          source={require('../mobile/assets/icon_1.png')}
+          style={{ width: 150, height: 150 }}
         />
         <Text style={{ fontSize: 25, fontWeight: '600' }}>Elder's Helper</Text>
       </View>
@@ -154,8 +138,9 @@ export default function LoginPage() {
           </View>
         </TouchableOpacity>
       </View>
-      <View style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+      <View style={{ alignItems: 'center', marginTop: 20, flex: 1 }}>
         <Image source={require('../mobile/assets/Stetoscop.png')} />
+      </View>
       </View>
     </SafeAreaView>
   );
@@ -164,9 +149,12 @@ export default function LoginPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f0f0f5",
-    marginHorizontal: 30,
+    backgroundColor: "#fff",
+   
   },
+    section: {
+      marginHorizontal: 30,
+    }, 
   title: {
     fontSize: 32,
     fontWeight: "bold",
