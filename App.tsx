@@ -20,11 +20,11 @@ function HomeTabs() {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: string = '';
 
-          if (route.name === 'Home') {
+          if (route.name === 'Acasa') {
             iconName = focused ? 'home' : 'home-outline';
-          } else if (route.name === 'Health') {
+          } else if (route.name === 'Sanatate') {
             iconName = focused ? 'heart' : 'heart-outline';
-          } else if (route.name === 'Allert') {
+          } else if (route.name === 'Profil') {
             iconName = focused ? 'alert' : 'alert-outline';
           }
 
@@ -34,9 +34,9 @@ function HomeTabs() {
         tabBarInactiveTintColor: 'gray',
       })}
     >
-      <Tab.Screen name="Home" component={HomePage} />
-      <Tab.Screen name="Health" component={HealthPage} />
-      <Tab.Screen name="Allert" component={AllertPage} />
+      <Tab.Screen name="Acasa" component={HomePage} />
+      <Tab.Screen name="Sanatate" component={HealthPage} />
+      <Tab.Screen name="Profil" component={AllertPage} />
     </Tab.Navigator>
   );
 }
@@ -46,7 +46,7 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="LoginPage">
         <Stack.Screen name="LoginPage" component={LoginPage} options={{ headerShown: false }} />
-        <Stack.Screen name="HomeTabs" component={HomeTabs} options={{ headerShown: false }} />
+        <Stack.Screen name="HomeTabs"  component={HomeTabs} options={{ headerShown: false, gestureEnabled : false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

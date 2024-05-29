@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import axios from 'axios';
-
+import { getAccessToken } from './storage/storageService';
+import { BASE_URL } from './routes/routes';
+import { endpoints } from './routes/routes';
 export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState({
@@ -18,17 +20,20 @@ export default function HomePage() {
 
   useEffect(() => {
     const fetchUserData = async () => {
+      const accesToken =  await getAccessToken(); 
+      console.log(accesToken);
       try {
-        const userResponse = await axios.get('http://138.68.82.166:1000/user/getUserData', {
+        const userResponse = await axios.get(`${BASE_URL}${endpoints.GetUserData}`, {
           headers: {
-            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJwYWNpZW50QHBhY2llbnQuY29tIiwiaWF0IjoxNzE3MDAzNjg2LCJleHAiOjE3MTcwMDcyODZ9.BdZiqyjCvInlbvwSqinPKnqj4RL8S6DIzZ3MRYNIEEI` 
+            Authorization: `Bearer ${accesToken}` 
           }
         });
-        const pacientResponse = await axios.get('http://138.68.82.166:1000/user/getPacientData', {
+        const pacientResponse = await axios.get(`${BASE_URL}${endpoints.GetPacientData}`, {
           headers: {
-            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJwYWNpZW50QHBhY2llbnQuY29tIiwiaWF0IjoxNzE3MDAzNjg2LCJleHAiOjE3MTcwMDcyODZ9.BdZiqyjCvInlbvwSqinPKnqj4RL8S6DIzZ3MRYNIEEI` 
+            Authorization: `Bearer ${accesToken}` 
           }
         });
+        
 
         const userData = userResponse.data.user;
         const pacientData = pacientResponse.data.pacient;
