@@ -8,7 +8,7 @@ import {
   Image,
   ActivityIndicator,
 } from "react-native";
-
+import { endpoints } from "./routes/routes";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { SafeAreaView } from "react-native";
 import axios from "axios";
@@ -46,7 +46,7 @@ export default function LoginPage() {
     if (!globalErrorFlag) {
       setLoading(true);
       try {
-        const response = await axios.post(`http://192.168.0.101:1000/user/login`, {
+        const response = await axios.post(`${BASE_URL}${endpoints.Login}`, {
           userData: {
             email: email,
             password: password,

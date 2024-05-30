@@ -42,12 +42,12 @@ interface Diagnostic {
 }
 
 interface HealthData {
-  consult: ConsultData;
-  sensor_data: SensorData[];
-  tratamente: Tratament[];
-  medicamente: Medicament[];
-  recomandare: Recomandare[];
-  diagnostic: Diagnostic[];
+  Consult: ConsultData;
+  Senzor_data: SensorData[];
+  Tratamente: Tratament[];
+  Schema_medicamentatie: Medicament[];
+  Recomandare_medic: Recomandare[];
+  Diagnostic: Diagnostic[];
 }
 
 export default function HealthPage() {
@@ -107,7 +107,7 @@ export default function HealthPage() {
     );
   }
 
-  const latestSensorData = healthData.sensor_data[healthData.sensor_data.length - 1];
+  const latestSensorData = healthData.Senzor_data[healthData.Senzor_data.length - 1];
 
   return (
     <ScrollView style={styles.container}>
@@ -119,11 +119,11 @@ export default function HealthPage() {
         <View style={styles.infoBox}>
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Tensiune arterială</Text>
-            <Text style={styles.infoValueGreen}>{healthData.consult.tensiune}</Text>
+            <Text style={styles.infoValueGreen}>{healthData.Consult.tensiune}</Text>
           </View>
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Glicemie</Text>
-            <Text style={styles.infoValueRed}>{healthData.consult.glicemie}</Text>
+            <Text style={styles.infoValueRed}>{healthData.Consult.glicemie}</Text>
           </View>
           <View style={styles.infoItem}>
             <Text style={styles.infoLabel}>Bătăi pe minut</Text>
@@ -134,8 +134,8 @@ export default function HealthPage() {
 
      <View style={styles.section}>
         <Text style={styles.sectionTitle}>Medicamente prescrise</Text>
-        {healthData.medicamente && healthData.medicamente.length > 0 ? (
-          healthData.medicamente.map((medicament, index) => (
+        {healthData.Schema_medicamentatie && healthData.Schema_medicamentatie.length > 0 ? (
+          healthData.Schema_medicamentatie.map((medicament, index) => (
             <View key={index} style={styles.infoBox}>
               <View style={styles.infoItem}>
                 <Text style={styles.infoLabel}>Nume Medicament</Text>
@@ -154,7 +154,7 @@ export default function HealthPage() {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Recomandări</Text>
-        {healthData.recomandare.map((recomandare, index) => (
+        {healthData.Recomandare_medic.map((recomandare, index) => (
           <View key={index} style={styles.infoBox}>
             <View style={styles.infoItem}>
               <Text style={styles.infoLabel}>Tip Recomandare</Text>
@@ -178,7 +178,7 @@ export default function HealthPage() {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Tratamente</Text>
-        {healthData.tratamente.map((tratament, index) => (
+        {healthData.Tratamente.map((tratament, index) => (
           <View key={index} style={styles.infoBox}>
             <View style={styles.infoItem}>
               <Text style={styles.infoLabel}>Tratament</Text>
@@ -210,7 +210,7 @@ export default function HealthPage() {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Diagnostic</Text>
-        {healthData.diagnostic.map((diagnostic, index) => (
+        {healthData.Diagnostic.map((diagnostic, index) => (
           <View key={index} style={styles.infoBox}>
             <View style={styles.infoItem}>
               <Text style={styles.infoLabel}>Diagnostic</Text>
