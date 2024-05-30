@@ -32,6 +32,7 @@ function HomeTabs() {
         },
         tabBarActiveTintColor: 'tomato',
         tabBarInactiveTintColor: 'gray',
+        headerShown: false,  // Am adăugat această linie
       })}
     >
       <Tab.Screen name="Acasa" component={HomePage} />
@@ -46,7 +47,7 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="LoginPage">
         <Stack.Screen name="LoginPage" component={LoginPage} options={{ headerShown: false }} />
-        <Stack.Screen name="HomeTabs"  component={HomeTabs} options={{ headerShown: false, gestureEnabled : false }} />
+        <Stack.Screen name="HomeTabs" component={HomeTabs} options={{ headerShown: false, gestureEnabled : false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

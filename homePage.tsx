@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import { getAccessToken } from './storage/storageService';
 import { BASE_URL } from './routes/routes';
 import { endpoints } from './routes/routes';
+
 export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState({
@@ -21,7 +22,6 @@ export default function HomePage() {
   useEffect(() => {
     const fetchUserData = async () => {
       const accesToken =  await getAccessToken(); 
-      console.log(accesToken);
       try {
         const userResponse = await axios.get(`${BASE_URL}${endpoints.GetUserData}`, {
           headers: {
@@ -33,7 +33,6 @@ export default function HomePage() {
             Authorization: `Bearer ${accesToken}` 
           }
         });
-        
 
         const userData = userResponse.data.user;
         const pacientData = pacientResponse.data.pacient;
@@ -80,9 +79,6 @@ export default function HomePage() {
               <InfoItem label="Profesie:" value={userData.profesie} />
               <InfoItem label="Loc de munca:" value={userData.loc_munca} />
             </View>
-            <TouchableOpacity style={styles.downloadButton}>
-              <Text style={styles.downloadButtonText}>Descarca fisa medicala</Text>
-            </TouchableOpacity>
           </View>
         </>
       )}
@@ -102,11 +98,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f0f0f5',
     padding: 20,
+    marginTop: 40,
   },
   header: {
     alignItems: 'center',
     marginBottom: 20,
-    position: 'relative',
   },
   headerTitle: {
     fontSize: 24,
@@ -146,23 +142,5 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
     paddingVertical: 5,
-  },
-  downloadButton: {
-    width: '100%',
-    height: 50,
-    backgroundColor: '#4CAF50',
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  downloadButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
   },
 });
