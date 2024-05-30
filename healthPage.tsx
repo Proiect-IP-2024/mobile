@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
-import EKGChart from './EKG/EKGChart';
+import axios from 'axios';
 import { BASE_URL } from './routes/routes';
 import { getAccessToken } from './storage/storageService';
 import { endpoints } from './routes/routes';
+
 interface ConsultData {
   tensiune: number;
   glicemie: number;
@@ -13,48 +14,70 @@ interface SensorData {
   valoare_puls: number;
 }
 
+interface Tratament {
+  tratament: string;
+  data_emitere: string;
+  alte_detalii: string;
+  bifat_supraveghetor: number;
+  data_ora_bifare: string;
+  observatii_ingrijitor: string;
+}
+
+interface Medicament {
+  nume_medicament: string;
+  frecventa: string;
+}
+
+interface Recomandare {
+  tip_recomandare: string;
+  durata_zilnica: number;
+  alte_indicatii: string;
+  tratamente: string;
+}
+
+interface Diagnostic {
+  diagnostic: string;
+  data_emitere: string;
+  alte_detalii: string;
+}
+
 interface HealthData {
   consult: ConsultData;
   sensor_data: SensorData[];
+  tratamente: Tratament[];
+  medicamente: Medicament[];
+  recomandare: Recomandare[];
+  diagnostic: Diagnostic[];
 }
 
 export default function HealthPage() {
   const [healthData, setHealthData] = useState<HealthData | null>(null);
   const [loading, setLoading] = useState(true);
-  
+
   const fetchData = async () => {
-    const accesToken =  await getAccessToken(); 
+    const accessToken = await getAccessToken();
     try {
-     
-      const userResponse = await fetch(`${BASE_URL}${endpoints.GetUserData}`, {
-        method: 'GET',
+      const userResponse = await axios.get(`${BASE_URL}${endpoints.GetUserData}`, {
         headers: {
-          'Authorization': `Bearer ${accesToken}`
-        }
-      });
-      
-      if (!userResponse.ok) {
-        throw new Error('Failed to fetch user data');
-      }
-
-      const userData = await userResponse.json();
-      const userId = userData.user.user_id;
-
-      const profileResponse = await fetch(`${BASE_URL}${endpoints.GetPacientData}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accesToken}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ pacientID: userId })
       });
 
-      if (!profileResponse.ok) {
-        throw new Error('Failed to fetch pacient profile');
-      }
+      const userId = userResponse.data.user.user_id;
 
-      const profileData = await profileResponse.json();
-      setHealthData(profileData.pacient);
+      const profileResponse = await axios.post(
+        `${BASE_URL}${endpoints.GetPacientProfile}`,
+        { pacientID: userId },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      setHealthData(profileResponse.data.pacient);
+      console.log(profileResponse.data.pacient);
       setLoading(false);
     } catch (error) {
       console.error(error);
@@ -64,8 +87,8 @@ export default function HealthPage() {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 5000); // Reîmprospătare la fiecare 5 secunde
-    return () => clearInterval(interval); // Curățare interval la demontarea componentului
+    const interval = setInterval(fetchData, 5000); // Refresh every 5 seconds
+    return () => clearInterval(interval); // Cleanup interval on component unmount
   }, []);
 
   if (loading) {
@@ -79,7 +102,7 @@ export default function HealthPage() {
   if (!healthData) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Failed to load health data</Text>
+        <Text style={styles.errorText}>Încărcarea datelor de sănătate a eșuat</Text>
       </View>
     );
   }
@@ -88,11 +111,14 @@ export default function HealthPage() {
 
   return (
     <ScrollView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Profilul Sănătății</Text>
+      </View>
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Informatii sanatate</Text>
+        <Text style={styles.sectionTitle}>Informații Sănătate</Text>
         <View style={styles.infoBox}>
           <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Tensiune arteriala</Text>
+            <Text style={styles.infoLabel}>Tensiune arterială</Text>
             <Text style={styles.infoValueGreen}>{healthData.consult.tensiune}</Text>
           </View>
           <View style={styles.infoItem}>
@@ -100,24 +126,164 @@ export default function HealthPage() {
             <Text style={styles.infoValueRed}>{healthData.consult.glicemie}</Text>
           </View>
           <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Batai pe minut</Text>
+            <Text style={styles.infoLabel}>Bătăi pe minut</Text>
             <Text style={styles.infoValueRed}>{latestSensorData.valoare_puls}</Text>
           </View>
         </View>
       </View>
+
+     <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Medicamente prescrise</Text>
+        {healthData.medicamente && healthData.medicamente.length > 0 ? (
+          healthData.medicamente.map((medicament, index) => (
+            <View key={index} style={styles.infoBox}>
+              <View style={styles.infoItem}>
+                <Text style={styles.infoLabel}>Nume Medicament</Text>
+                <Text style={styles.infoValue}>{medicament.nume_medicament}</Text>
+              </View>
+              <View style={styles.infoItem}>
+                <Text style={styles.infoLabel}>Frecvență</Text>
+                <Text style={styles.infoValue}>{medicament.frecventa}</Text>
+              </View>
+            </View>
+          ))
+        ) : (
+          <Text style={styles.infoValue}>Nu există medicamente prescrise.</Text>
+        )}
+      </View>
+
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Informatii EKG</Text>
-        {/* <EKGChart /> */}
+        <Text style={styles.sectionTitle}>Recomandări</Text>
+        {healthData.recomandare.map((recomandare, index) => (
+          <View key={index} style={styles.infoBox}>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Tip Recomandare</Text>
+              <Text style={styles.infoValue}>{recomandare.tip_recomandare}</Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Durată Zilnică</Text>
+              <Text style={styles.infoValue}>{recomandare.durata_zilnica} ore</Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Alte Indicații</Text>
+              <Text style={styles.infoValue}>{recomandare.alte_indicatii}</Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Tratamente</Text>
+              <Text style={styles.infoValue}>{recomandare.tratamente}</Text>
+            </View>
+          </View>
+        ))}
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Tratamente</Text>
+        {healthData.tratamente.map((tratament, index) => (
+          <View key={index} style={styles.infoBox}>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Tratament</Text>
+              <Text style={styles.infoValue}>{tratament.tratament}</Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Data Emitere</Text>
+              <Text style={styles.infoValue}>{new Date(tratament.data_emitere).toLocaleDateString()}</Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Alte Detalii</Text>
+              <Text style={styles.infoValue}>{tratament.alte_detalii}</Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Bifat Supraveghetor</Text>
+              <Text style={styles.infoValue}>{tratament.bifat_supraveghetor ? 'Da' : 'Nu'}</Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Data Ora Bifare</Text>
+              <Text style={styles.infoValue}>{tratament.data_ora_bifare}</Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Observații Îngrijitor</Text>
+              <Text style={styles.infoValue}>{tratament.observatii_ingrijitor}</Text>
+            </View>
+          </View>
+        ))}
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Diagnostic</Text>
+        {healthData.diagnostic.map((diagnostic, index) => (
+          <View key={index} style={styles.infoBox}>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Diagnostic</Text>
+              <Text style={styles.infoValue}>{diagnostic.diagnostic}</Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Data Emitere</Text>
+              <Text style={styles.infoValue}>{new Date(diagnostic.data_emitere).toLocaleDateString()}</Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Detalii</Text>
+              <Text style={styles.infoValue}>{diagnostic.alte_detalii}</Text>
+            </View>
+          </View>
+        ))}
+      </View>
+        
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Informații EKG</Text>
+        <View style={styles.ekgImagePlaceholder}>
+          {/* Placeholder for EKG information or image */}
+        </View>
       </View>
     </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f0f5',
+    backgroundColor: '#f5f5f5',
+    marginTop: 40, 
+  },
+  header: {
     padding: 20,
+   
+    alignItems: 'center',
+  },
+  headerTitle: {
+    color: '#000',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  section: {
+    padding: 20,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  infoBox: {
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  },
+  infoItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 5,
+  },
+  infoLabel: {
+    fontWeight: 'bold',
+  },
+  infoValue: {
+    color: '#333',
+  },
+  infoValueGreen: {
+    color: 'green',
+  },
+  infoValueRed: {
+    color: 'red',
   },
   loadingContainer: {
     flex: 1,
@@ -130,51 +296,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   errorText: {
+    color: 'red',
     fontSize: 18,
-    color: 'red',
-  },
-  section: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
-  },
-  infoBox: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  infoItem: {
-    marginBottom: 10,
-  },
-  infoLabel: {
-    fontSize: 16,
-    color: '#333',
-    fontWeight: 'bold',
-  },
-  infoValueGreen: {
-    fontSize: 16,
-    color: 'green',
-    marginTop: 5,
-  },
-  infoValueRed: {
-    fontSize: 16,
-    color: 'red',
-    marginTop: 5,
   },
   ekgImagePlaceholder: {
     height: 200,
-    backgroundColor: '#ddd',
-    borderRadius: 10,
+    backgroundColor: '#ccc',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

@@ -21,7 +21,6 @@ export default function HomePage() {
   useEffect(() => {
     const fetchUserData = async () => {
       const accesToken =  await getAccessToken(); 
-      console.log(accesToken);
       try {
         const userResponse = await axios.get(`${BASE_URL}${endpoints.GetUserData}`, {
           headers: {
@@ -80,9 +79,7 @@ export default function HomePage() {
               <InfoItem label="Profesie:" value={userData.profesie} />
               <InfoItem label="Loc de munca:" value={userData.loc_munca} />
             </View>
-            <TouchableOpacity style={styles.downloadButton}>
-              <Text style={styles.downloadButtonText}>Descarca fisa medicala</Text>
-            </TouchableOpacity>
+        
           </View>
         </>
       )}
@@ -102,6 +99,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f0f0f5',
     padding: 20,
+    marginTop: 40, 
   },
   header: {
     alignItems: 'center',
